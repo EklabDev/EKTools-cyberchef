@@ -1,0 +1,165 @@
+openapi: 3.1.0
+info:
+  title: EK Tools Image Backend
+  description: 'Image processing API: vectorize, rasterize, and background removal'
+  version: 0.1.0
+paths:
+  /vectorize:
+    post:
+      tags:
+      - vectorize
+      summary: Vectorize
+      description: "Vectorize a PNG image into an SVG with configurable color quantization.\n\
+        \nArgs:\n    file: PNG image file\n    colors: Number of colors (2-20)\n\n\
+        Returns:\n    SVG content as text/plain"
+      operationId: vectorize_vectorize_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_vectorize_vectorize_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /rasterize:
+    post:
+      tags:
+      - rasterize
+      summary: Rasterize
+      description: "Convert an SVG file to PNG.\n\nArgs:\n    file: SVG file\n   \
+        \ \nReturns:\n    PNG image as image/png"
+      operationId: rasterize_rasterize_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_rasterize_rasterize_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /remove-background:
+    post:
+      tags:
+      - remove-background
+      summary: Remove Background Endpoint
+      description: "Remove background from a JPEG or PNG image.\n\nArgs:\n    file:\
+        \ JPEG or PNG image file\n    \nReturns:\n    PNG image with alpha channel\
+        \ as image/png"
+      operationId: remove_background_endpoint_remove_background_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_remove_background_endpoint_remove_background_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /:
+    get:
+      summary: Root
+      description: Health check endpoint.
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /health:
+    get:
+      summary: Health
+      description: Health check endpoint.
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Body_rasterize_rasterize_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_rasterize_rasterize_post
+    Body_remove_background_endpoint_remove_background_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_remove_background_endpoint_remove_background_post
+    Body_vectorize_vectorize_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+        colors:
+          type: integer
+          title: Colors
+      type: object
+      required:
+      - file
+      - colors
+      title: Body_vectorize_vectorize_post
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

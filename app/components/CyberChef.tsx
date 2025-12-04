@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { allTools } from '@/lib/all-tools';
-import { Copy, Play, Box } from 'lucide-react';
+import { Copy, Play } from 'lucide-react';
 import { z } from 'zod';
 
 export default function CyberChef() {
@@ -154,13 +154,7 @@ export default function CyberChef() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen">
-      {/* Header */}
-      <header className="h-14 bg-slate-900 border-b border-slate-800 flex items-center px-6 shadow-sm">
-        <Box className="w-6 h-6 text-blue-500 mr-2" />
-        <h1 className="text-lg font-bold tracking-tight">Mini CyberChef <span className="text-slate-500 text-sm font-normal ml-2">Next.js + MCP</span></h1>
-      </header>
-
+    <div className="flex flex-col h-full">
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         
