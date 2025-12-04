@@ -120,7 +120,7 @@ export default function CyberChef() {
       
       if (def instanceof z.ZodNumber) type = 'number';
       if (def instanceof z.ZodEnum) {
-          options = def._def.values;
+          options = (def as any)._def.values;
       }
       
       return (

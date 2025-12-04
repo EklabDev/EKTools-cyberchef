@@ -34,7 +34,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: allTools.map((tool) => ({
       name: tool.name,
       description: tool.description,
-      inputSchema: zodToJsonSchema(tool.inputSchema) as any,
+      inputSchema: zodToJsonSchema(tool.inputSchema as any) as any,
     })),
   };
 });
