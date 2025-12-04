@@ -142,7 +142,7 @@ export default function ImageTools() {
           body: formData,
         });
       } else {
-        const baseUrl = process.env.NEXT_PUBLIC_IMAGE_API_URL || 'https://eklab-image.eklab.xyz';
+        const baseUrl = 'https://ektools-image.eklab.xyz';
         response = await fetch(`${baseUrl}/${currentTool.id}`, {
           method: 'POST',
           body: formData,
