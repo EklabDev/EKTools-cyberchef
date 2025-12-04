@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mini CyberChef + MCP Server
 
-## Getting Started
+A "Mini CyberChef" application built with Next.js 15, TypeScript, and TailwindCSS.
+It functions as both a **Standalone Web App** and an **MCP Server** exposing transformation tools to AI agents.
 
-First, run the development server:
+## 🚀 Getting Started
+
+### 1. Standalone Web App
+
+To run the web interface:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. MCP Server
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To run the MCP server (Stdio transport):
 
-## Learn More
+```bash
+pnpm start:mcp
+```
 
-To learn more about Next.js, take a look at the following resources:
+This allows MCP clients (like Claude Desktop or Cursor) to connect to the server via standard input/output.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Core Categories
+- **Encoding**: Base64, Base32, URL, HTML, Hex, Binary
+- **Encryption**: AES (CBC/CTR), RSA, SHA Hashing, HMAC
+- **Conversion**: Text/Bytes, Hex/Bytes, Number Base, Endianness
+- **Date & Time**: Timestamp conversions, Timezones, Date Arithmetic
+- **Binary**: XOR, Bitwise ops, CRC32, Adler32
 
-## Deploy on Vercel
+### MCP Tools
+All transformations are exposed as MCP tools.
+Example Tools:
+- `base64_encode`
+- `aes_encrypt`
+- `timestamp_to_datetime`
+- `xor`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🧩 Architecture
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```mermaid
+graph TD
+    A[User Interface (Next.js)] -->|Calls| B[Lib/Transformers]
+    C[MCP Server (Node)] -->|Calls| B
+    B --> D[CryptoJS / Luxon / etc]
+    
+    subgraph "Shared Logic"
+    B
+    end
+    
+    subgraph "Entry Points"
+    A
+    C
+    end
+```
+
+- **`app/`**: Next.js App Router UI
+- **`lib/transformers/`**: Core logic (Isomorphic where possible)
+- **`mcp/`**: MCP Server implementation (Tool Definitions & Handler)
+- **`scripts/`**: Utility scripts
+
+## 📝 How to Add a New Transformer
+
+1. **Implement Logic**: Add function to `lib/transformers/<category>.ts`
+2. **Define Tool**: Add tool definition to `mcp/<category>.ts` (Name, Schema, Handler)
+3. **Register**: Ensure it's exported in `mcp/index.ts` and `lib/all-tools.ts`
+4. **UI**: The UI automatically picks up the new tool from `lib/all-tools.ts`
+
+## 🧪 Testing
+
+Run unit tests:
+
+```bash
+npx jest
+```
+
+(Playwright tests pending setup)
