@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, Download, ZoomIn, ZoomOut, RotateCcw, Image as ImageIcon, Play, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
-type ImageToolType = 'vectorize' | 'rasterize' | 'remove-background' | 'heic-to-jpg' | 'heic-to-png';
+type ImageToolType = 'vectorize' | 'rasterize' | 'remove-background' | 'heic-to-jpg' | 'heic-to-png' | 'image-to-base64';
 
 interface ToolDefinition {
   id: ImageToolType;
@@ -53,6 +53,12 @@ const TOOLS: ToolDefinition[] = [
     name: 'HEIC to PNG',
     description: 'Convert HEIC image to PNG.',
     accepts: '.heic',
+  },
+  {
+    id: 'image-to-base64',
+    name: 'Image to Base64',
+    description: 'Convert PNG or JPEG image to Base64 string.',
+    accepts: 'image/png, image/jpeg',
   }
 ];
 
@@ -64,7 +70,7 @@ export default function ImageTools() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [outputUrl, setOutputUrl] = useState<string | null>(null);
-  const [outputType, setOutputType] = useState<'image' | 'svg'>('image');
+  const [outputType, setOutputType] = useState<'image' | 'svg' | 'text'>('image');
   const [outputContent, setOutputContent] = useState<string | null>(null); // For SVG text
 
   // Viewport controls
@@ -135,14 +141,35 @@ export default function ImageTools() {
       });
 
       let response;
-      if (currentTool.id === 'heic-to-jpg' || currentTool.id === 'heic-to-png') {
+      if (currentTool.id === 'image-to-base64') {
+        // Client-side conversion
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Result is already base64 data URL
+          // If we want just the base64 part, we can strip the prefix, but data URL is usually what's needed.
+          // Let's output it as text content
+          setOutputContent(result);
+          setOutputType('text'); // New type for text display
+          // Also create a blob for download as text file
+          const blob = new Blob([result], { type: 'text/plain' });
+          setOutputUrl(URL.createObjectURL(blob));
+          setIsProcessing(false);
+        };
+        reader.onerror = () => {
+           setError("Failed to read file");
+           setIsProcessing(false);
+        };
+        reader.readAsDataURL(currentFile);
+        return; // Early return for client-side tool
+      } else if (currentTool.id === 'heic-to-jpg' || currentTool.id === 'heic-to-png') {
         formData.append('format', currentTool.id === 'heic-to-png' ? 'PNG' : 'JPEG');
         response = await fetch('/api/convert-heic', {
           method: 'POST',
           body: formData,
         });
       } else {
-        const baseUrl = 'https://ektools-image.eklab.xyz';
+        const baseUrl = process.env.NEXT_PUBLIC_IMAGE_API_URL || 'https://eklab-image.eklab.xyz';
         response = await fetch(`${baseUrl}/${currentTool.id}`, {
           method: 'POST',
           body: formData,
@@ -191,7 +218,9 @@ export default function ImageTools() {
     if (!outputUrl) return;
     const a = document.createElement('a');
     a.href = outputUrl;
-    const ext = outputType === 'svg' ? 'svg' : 'png';
+    let ext = 'png';
+    if (outputType === 'svg') ext = 'svg';
+    if (outputType === 'text') ext = 'txt';
     a.download = `result.${ext}`;
     document.body.appendChild(a);
     a.click();
@@ -353,6 +382,13 @@ export default function ImageTools() {
                         dangerouslySetInnerHTML={{ __html: outputContent }} 
                         className="origin-center"
                       />
+                   ) : outputType === 'text' && outputContent ? (
+                      <textarea 
+                        readOnly
+                        value={outputContent}
+                        className="w-full h-full bg-slate-900/90 text-slate-200 font-mono text-xs p-4 resize-none outline-none border border-slate-700 rounded"
+                        style={{ minWidth: '300px', minHeight: '300px' }}
+                      />
                    ) : (
                       <img 
                         src={outputUrl} 
@@ -390,7 +426,7 @@ export default function ImageTools() {
           </div>
 
           <div className="p-2 border-t border-slate-800 text-xs text-slate-500 text-right">
-            {outputUrl ? (outputType === 'svg' ? 'SVG Vector' : 'PNG Image') : 'No output'}
+            {outputUrl ? (outputType === 'svg' ? 'SVG Vector' : outputType === 'text' ? 'Base64 Text' : 'PNG Image') : 'No output'}
           </div>
         </div>
 

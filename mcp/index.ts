@@ -6,6 +6,7 @@ import { tools as cryptoTools } from "./crypto";
 import { tools as convertTools } from "./convert";
 import { tools as dateTools } from "./date";
 import { tools as binaryTools } from "./binary";
+import { tools as schemaTools } from "./schema";
 import { ToolDefinition } from "./tools";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
@@ -14,7 +15,8 @@ const allTools: ToolDefinition[] = [
   ...cryptoTools,
   ...convertTools,
   ...dateTools,
-  ...binaryTools
+  ...binaryTools,
+  ...schemaTools
 ];
 
 const server = new Server(

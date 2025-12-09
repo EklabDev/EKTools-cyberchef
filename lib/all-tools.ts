@@ -3,6 +3,7 @@ import { tools as cryptoTools } from "../mcp/crypto";
 import { tools as convertTools } from "../mcp/convert";
 import { tools as dateTools } from "../mcp/date";
 import { tools as binaryTools } from "../mcp/binary";
+import { tools as schemaTools } from "../mcp/schema";
 
 export const allTools = [
   ...encodingTools.map(t => ({ ...t, category: 'Encoding' })),
@@ -10,6 +11,7 @@ export const allTools = [
   ...convertTools.map(t => ({ ...t, category: 'Conversion' })),
   ...dateTools.map(t => ({ ...t, category: 'Date & Time' })),
   ...binaryTools.map(t => ({ ...t, category: 'Binary' })),
+  ...schemaTools.map(t => ({ ...t, category: 'Schema' })),
 ];
 
 

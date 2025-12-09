@@ -38,7 +38,7 @@ export default function CyberChef() {
     setError(null);
     try {
       // Construct arguments
-      const args = { input, ...params };
+      // const args = { input, ...params }; // args unused, keeping params construction below
       
       // Parse params? Some might be numbers.
       // The Zod schema will validate, but HTML inputs return strings.
@@ -118,9 +118,31 @@ export default function CyberChef() {
           def = def._def.innerType;
       }
       
-      if (def instanceof z.ZodNumber) type = 'number';
-      if (def instanceof z.ZodEnum) {
+      // Use typeName check for robustness (instanceof can be flaky if multiple zod versions or bundling issues)
+      const typeName = (def as any)._def?.typeName;
+      
+      if (typeName === 'ZodNumber') type = 'number';
+      if (typeName === 'ZodEnum') {
+          console.log('inner', "enum1");
+           
           options = (def as any)._def.values;
+      }
+      
+      // Fallback for instanceof if typeName missing (older zod?)
+      if (!typeName) {
+         if (def instanceof z.ZodNumber) type = 'number';
+         if (def instanceof z.ZodEnum) {
+          options = Object.values((def as any)._def.entries);
+         }
+         // Also check for ZodEffects which might wrap ZodEnum
+         // Or optional wrapped types
+         if (def instanceof z.ZodOptional) {
+             const inner = def._def.innerType;
+             if (inner instanceof z.ZodEnum) {
+              console.log('inner', "enum3");
+                options = (inner as any)._def.values;
+             }
+         }
       }
       
       return (
