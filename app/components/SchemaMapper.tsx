@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Play } from 'lucide-react';
-import { SchemaFormat } from '@/lib/schema-mapper/types';
+import { SchemaFormat, FORMAT_LABELS } from '@/lib/schema-mapper/types';
 import { validateInput } from '@/lib/schema-mapper/formats';
 import { convert } from '@/lib/schema-mapper/pipeline';
 import { FORMAT_NOTES } from '@/lib/schema-mapper/format-notes';
@@ -12,11 +12,28 @@ import OutputPanel from './schema-mapper/OutputPanel';
 const DEBOUNCE_MS = 400;
 const MAX_INPUT_SIZE = 500_000;
 
-export default function SchemaMapper() {
+const ALL_FORMATS = Object.keys(FORMAT_LABELS) as SchemaFormat[];
+
+function resolveFormat(label?: string, fallback: SchemaFormat = 'typescript'): SchemaFormat {
+  if (!label) return fallback;
+  const byKey = ALL_FORMATS.find(k => k === label.toLowerCase());
+  if (byKey) return byKey;
+  const byLabel = ALL_FORMATS.find(k => FORMAT_LABELS[k].toLowerCase() === label.toLowerCase());
+  if (byLabel) return byLabel;
+  return fallback;
+}
+
+interface SchemaMapperProps {
+  initialSource?: string;
+  initialTarget?: string;
+  onStateChange?: (source: string, target: string) => void;
+}
+
+export default function SchemaMapper({ initialSource, initialTarget, onStateChange }: SchemaMapperProps) {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [sourceFormat, setSourceFormat] = useState<SchemaFormat>('typescript');
-  const [targetFormat, setTargetFormat] = useState<SchemaFormat>('json-schema');
+  const [sourceFormat, setSourceFormat] = useState<SchemaFormat>(() => resolveFormat(initialSource, 'typescript'));
+  const [targetFormat, setTargetFormat] = useState<SchemaFormat>(() => resolveFormat(initialTarget, 'json-schema'));
   const [validationError, setValidationError] = useState<string | null>(null);
   const [conversionError, setConversionError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
@@ -71,11 +88,13 @@ export default function SchemaMapper() {
   const handleSourceFormatChange = (format: SchemaFormat) => {
     setSourceFormat(format);
     setConversionError(null);
+    onStateChange?.(FORMAT_LABELS[format], FORMAT_LABELS[targetFormat]);
   };
 
   const handleTargetFormatChange = (format: SchemaFormat) => {
     setTargetFormat(format);
     setConversionError(null);
+    onStateChange?.(FORMAT_LABELS[sourceFormat], FORMAT_LABELS[format]);
   };
 
   return (

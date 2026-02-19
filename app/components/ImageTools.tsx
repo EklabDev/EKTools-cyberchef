@@ -62,8 +62,22 @@ const TOOLS: ToolDefinition[] = [
   }
 ];
 
-export default function ImageTools() {
-  const [selectedToolId, setSelectedToolId] = useState<ImageToolType>('vectorize');
+interface ImageToolsProps {
+  initialOperation?: string;
+  onStateChange?: (operation: string) => void;
+}
+
+function resolveToolId(operation?: string): ImageToolType {
+  if (!operation) return 'vectorize';
+  const byName = TOOLS.find(t => t.name.toLowerCase() === operation.toLowerCase());
+  if (byName) return byName.id;
+  const byId = TOOLS.find(t => t.id === operation.toLowerCase());
+  if (byId) return byId.id;
+  return 'vectorize';
+}
+
+export default function ImageTools({ initialOperation, onStateChange }: ImageToolsProps) {
+  const [selectedToolId, setSelectedToolId] = useState<ImageToolType>(() => resolveToolId(initialOperation));
   const [inputFiles, setInputFiles] = useState<File[]>([]);
   const [selectedFileIndex, setSelectedFileIndex] = useState<number>(0);
   const [params, setParams] = useState<Record<string, any>>({ colors: 5 });
@@ -81,6 +95,12 @@ export default function ImageTools() {
   const currentTool = TOOLS.find(t => t.id === selectedToolId) || TOOLS[0];
   const currentFile = inputFiles[selectedFileIndex];
   const [inputPreviewUrl, setInputPreviewUrl] = useState<string | null>(null);
+
+  const handleToolSelect = (id: ImageToolType) => {
+    setSelectedToolId(id);
+    const tool = TOOLS.find(t => t.id === id);
+    if (tool) onStateChange?.(tool.name);
+  };
 
   useEffect(() => {
     if (currentFile) {
@@ -284,7 +304,7 @@ export default function ImageTools() {
               <select
                 className="w-full bg-slate-800 border border-slate-700 rounded p-2 text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
                 value={selectedToolId}
-                onChange={e => setSelectedToolId(e.target.value as ImageToolType)}
+                onChange={e => handleToolSelect(e.target.value as ImageToolType)}
               >
                 {TOOLS.map(tool => (
                   <option key={tool.id} value={tool.id}>{tool.name}</option>

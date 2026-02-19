@@ -4,6 +4,7 @@ import { tools as convertTools } from "../mcp/convert";
 import { tools as dateTools } from "../mcp/date";
 import { tools as binaryTools } from "../mcp/binary";
 import { tools as schemaTools } from "../mcp/schema";
+import { tools as textCompareTools } from "../mcp/text-compare";
 
 export const allTools = [
   ...encodingTools.map(t => ({ ...t, category: 'Encoding' })),
@@ -12,6 +13,7 @@ export const allTools = [
   ...dateTools.map(t => ({ ...t, category: 'Date & Time' })),
   ...binaryTools.map(t => ({ ...t, category: 'Binary' })),
   ...schemaTools.map(t => ({ ...t, category: 'Schema' })),
+  ...textCompareTools.map(t => ({ ...t, category: 'Text compare' })),
 ];
 
 

@@ -37,6 +37,9 @@ importers:
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
+      diff:
+        specifier: ^8.0.3
+        version: 8.0.3
       he:
         specifier: ^1.2.0
         version: 1.2.0
@@ -92,6 +95,9 @@ importers:
       '@types/crypto-js':
         specifier: ^4.2.2
         version: 4.2.2
+      '@types/diff':
+        specifier: ^8.0.0
+        version: 8.0.0
       '@types/he':
         specifier: ^1.2.3
         version: 1.2.3
@@ -1091,6 +1097,10 @@ packages:
 
   '@types/crypto-js@4.2.2':
     resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+
+  '@types/diff@8.0.0':
+    resolution: {integrity: sha512-o7jqJM04gfaYrdCecCVMbZhNdG6T1MHg/oQoRFdERLV+4d+V7FijhiEAbFu0Usww84Yijk9yH58U4Jk4HbtzZw==}
+    deprecated: This is a stub types definition. diff provides its own type definitions, so you do not need this installed.
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -4588,6 +4598,10 @@ snapshots:
       '@babel/types': 7.28.5
 
   '@types/crypto-js@4.2.2': {}
+
+  '@types/diff@8.0.0':
+    dependencies:
+      diff: 8.0.3
 
   '@types/estree@1.0.8': {}
 
