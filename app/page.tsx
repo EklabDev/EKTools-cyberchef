@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import CyberChef from "./components/CyberChef";
 import ImageTools from "./components/ImageTools";
-import { Box, Type, Image as ImageIcon } from 'lucide-react';
+import SchemaMapper from "./components/SchemaMapper";
+import { Box, Type, Image as ImageIcon, ArrowLeftRight } from 'lucide-react';
 
 export default function Page() {
-  const [mode, setMode] = useState<'text' | 'image'>('text');
+  const [mode, setMode] = useState<'text' | 'image' | 'schema'>('text');
 
   return (
     <main className="h-screen bg-slate-950 text-slate-200 font-mono flex flex-col overflow-hidden">
@@ -38,12 +39,22 @@ export default function Page() {
           >
             <ImageIcon size={14} /> Image Tools
           </button>
+          <button 
+            onClick={() => setMode('schema')}
+            className={`px-3 py-1 text-xs font-medium rounded flex items-center gap-2 transition-colors ${
+              mode === 'schema' 
+                ? 'bg-slate-700 text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+            }`}
+          >
+            <ArrowLeftRight size={14} /> Schema Mapper
+          </button>
         </div>
       </header>
 
       {/* Content Area */}
       <div className="flex-1 overflow-hidden relative">
-        {mode === 'text' ? <CyberChef /> : <ImageTools />}
+        {mode === 'text' ? <CyberChef /> : mode === 'image' ? <ImageTools /> : <SchemaMapper />}
       </div>
     </main>
   );
